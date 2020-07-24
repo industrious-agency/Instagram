@@ -166,6 +166,21 @@ class Provider extends AbstractProvider implements ProviderInterface
 
         return json_decode($response->getBody()->getContents(), true);
     }
+    
+    /**
+     * @param $fields
+     * @return $this
+     */
+    public function setFields($fields)
+    {
+        if (is_array($fields)) {
+            $fields = implode(',', $fields);
+        }
+        
+        $this->fields = $fields;
+        
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
