@@ -74,16 +74,47 @@ class Provider extends AbstractProvider implements ProviderInterface
         ];
 
         $response = $this->getHttpClient()->get(
-            'https://graph.instagram.com/me',
-            [
-                'query' => $query,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-            ]
-        );
+            'https://graph.instagram.com/me', [
+            'query' => $query,
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+        ]);
 
         return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * @param $token
+     * @return mixed
+     */
+    protected function getMediaByToken($token)
+    {
+        $query = [
+            'access_token' => $token,
+            'fields' => $this->fields,
+        ];
+
+        $response = $this->getHttpClient()->get(
+            'https://graph.instagram.com/me/media', [
+            'query' => $query,
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
+     * Get Media from a known access token.
+     *
+     * @param  string  $token
+     * @return \Laravel\Socialite\Two\User
+     */
+    public function mediaFromToken($token)
+    {
+        return $this->getMediaByToken($token);
     }
 
     /**
@@ -97,7 +128,6 @@ class Provider extends AbstractProvider implements ProviderInterface
                 'nickname' => $user['username'],
                 'name' => $user['username'],
                 'account_type' => $user['account_type'],
-                'media' => $user['media']['data'],
                 'avatar' => null,
             ]
         );
@@ -166,7 +196,7 @@ class Provider extends AbstractProvider implements ProviderInterface
 
         return json_decode($response->getBody()->getContents(), true);
     }
-    
+
     /**
      * @param $fields
      * @return $this
@@ -176,9 +206,9 @@ class Provider extends AbstractProvider implements ProviderInterface
         if (is_array($fields)) {
             $fields = implode(',', $fields);
         }
-        
+
         $this->fields = $fields;
-        
+
         return $this;
     }
 
